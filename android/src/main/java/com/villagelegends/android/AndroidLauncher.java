@@ -13,7 +13,7 @@ public class AndroidLauncher extends AndroidApplication {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Keep screen on
+        // Keep screen on while game runs
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Full immersive mode
@@ -27,13 +27,22 @@ public class AndroidLauncher extends AndroidApplication {
         );
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        
-        // Use default settings for these; setting them manually is often what causes compilation errors
-        // in newer LibGDX versions.
+        config.r = 8;
+        config.g = 8;
+        config.b = 8;
+        config.a = 8;
+        config.depth = 0;
+        config.stencil = 0;
+        config.numSamples = 2;           // MSAA
         config.useAccelerometer = false;
         config.useCompass = false;
         config.useWakelock = true;
-        
+        config.hideStatusBar = true;
+        config.useImmersiveMode = true;
+        config.disableAudio = false;
+        config.maxSimultaneousSounds = 16;
+        config.useGL30 = false;
+
         initialize(new VillageLegends(), config);
     }
 }
