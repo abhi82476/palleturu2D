@@ -1,0 +1,44 @@
+name: Build Android APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Point Gradle at the runner's Android SDK
+        run: echo "sdk.dir=${ANDROID_HOME:-$ANDROID_SDK_ROOT}" > local.properties
+
+      - name: Remove invalid Gradle wrapper JAR
+        run: rm -f gradle/wrapper/gradle-wrapper.jar
+
+      - name: Install Gradle 8.3 manually
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.3-bin.zip -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /opt/gradle
+          echo "/opt/gradle/gradle-8.3/bin" >> $GITHUB_PATH
+
+      - name: Build Debug APK
+        run: gradle android:assembleDebug --no-daemon --stacktrace
+
+      - name: Find APK
+        run: find . -name "*.apk" || echo "NO APK FOUND"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VillageLegends2D-debug-apk
+          path: android/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
